@@ -1,0 +1,52 @@
+version: '3.8'
+
+name : mernapp 
+
+services:
+ 
+ mongo:
+ image:
+ container_name: mongodb://127.0.0.1:27017/crud-appliction
+ ports:
+  -"27017:27017"
+  volumes:
+  - mongo_data:/data/db
+  networks : 
+   -mernapp
+
+backend:
+ bulid:
+ context: ./server
+ dockerfile: dockerfile
+ volumes :
+ -./server:/index
+ -index/node_modules
+ networks:
+ -mernapp
+ ports:
+ -"9000:9000"
+ depend_on:
+ -mongo
+ command : npm run dev
+
+
+frontend:
+ bulid:
+ context: ./client
+ dockerfile: dockerfile
+ volumes :
+ -./server:/app
+ -app/node_modules
+ networks:
+ -mernapp
+  command : npm start
+ ports:
+ -"3000:3000"
+ depend_on:
+ -backend
+
+volumes:
+ mongo_data:
+
+ networks:
+  drive: bridge 
